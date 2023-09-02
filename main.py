@@ -38,17 +38,20 @@ def main():
         logger.error("Failed to initialize exchange.")
         return
 
-    # List of symbols and timeframes to analyze
-    symbols = ['BTC/USDT', 'ETH/USDT']
+    # Fetch all available symbols from the exchange
+    symbols = list(ccxt_interface.exchange.markets.keys())
     timeframe = '1h'  # Fetching 1-hour data to calculate both daily and hourly volumes
 
     ohlcv_dict = {}
 
     for symbol in symbols:
         if ccxt_interface.check_symbol(symbol):
-            ohlcv_df = ccxt_interface.fetch_and_convert_ohlcv(
-                symbol, timeframe)
-            ohlcv_dict[symbol] = ohlcv_df
+            try:
+                ohlcv_df = ccxt_interface.fetch_and_convert_ohlcv(
+                    symbol, timeframe)
+                ohlcv_dict[symbol] = ohlcv_df
+            except Exception as e:
+                logger.warning(f"Failed to fetch data for {symbol}: {e}")
         else:
             logger.warning(f"Symbol {symbol} not found on the exchange.")
 
