@@ -11,9 +11,8 @@ sys.path.append('./src')
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 # Function to display a loading spinner
-
-
 def loading_spinner():
     spinner = "|/-\\"
     idx = 0

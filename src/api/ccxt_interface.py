@@ -19,8 +19,6 @@ class CCXTInterface:
             self.exchange = getattr(ccxt, exchange_name)()
             self.exchange.load_markets()
             logger.info("Exchange initialized: {}".format(exchange_name))
-            logger.info("Exchange markets: {}".format(
-                self.exchange.markets.keys()))
         except Exception as e:
             logger.error(
                 "Error initializing exchange: {}".format(exchange_name))
