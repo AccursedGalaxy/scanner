@@ -1,1 +1,1 @@
-# scanner
+# The Best Crypto Scanner
