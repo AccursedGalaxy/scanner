@@ -10,6 +10,7 @@
 import pandas as pd
 import logging
 from datetime import datetime, timedelta
+from termcolor import colored
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -17,7 +18,8 @@ logger = logging.getLogger(__name__)
 
 class VolumeAnalysis:
     def __init__(self):
-        pass
+        self.spikes_24h = []
+        self.spikes_1h = []
 
     def average_volume_per_day(self, ohlcv_df):
         daily_volume = ohlcv_df.resample('D').sum()['volume']
@@ -60,5 +62,23 @@ class VolumeAnalysis:
     def analyze_multiple_symbols(self, ohlcv_dict):
         for symbol, ohlcv_df in ohlcv_dict.items():
             logger.info(f"Analyzing volume for {symbol}")
-            self.check_volume_spike_24h(ohlcv_df)
-            self.check_volume_spike_1h(ohlcv_df)
+
+            spike_24h = self.check_volume_spike_24h(ohlcv_df)
+            spike_1h = self.check_volume_spike_1h(ohlcv_df)
+
+            if spike_24h:
+                self.spikes_24h.append(symbol)
+                print(
+                    colored(f"Volume spike detected in the last 24 hours for {symbol}", 'green'))
+
+            if spike_1h:
+                self.spikes_1h.append(symbol)
+                print(
+                    colored(f"Volume spike detected in the last hour for {symbol}", 'yellow'))
+
+        print("\nSummary:")
+        print("========")
+        print(
+            colored(f"24h Volume Spikes: {', '.join(self.spikes_24h)}", 'green'))
+        print(
+            colored(f"1h Volume Spikes: {', '.join(self.spikes_1h)}", 'yellow'))

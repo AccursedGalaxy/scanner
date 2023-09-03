@@ -40,7 +40,7 @@ class CCXTInterface:
                     break
                 ohlcv += new_data
                 since = new_data[-1][0] + 1  # +1 to avoid duplicates
-                logger.info(
+                logger.debug(
                     f"Fetched {len(new_data)} for symbol: {symbol} total data points: {len(ohlcv)}")
             except Exception as e:
                 logger.error(f"Failed to fetch ohlcv: {e}")
@@ -52,7 +52,7 @@ class CCXTInterface:
             ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
         df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
         df.set_index('timestamp', inplace=True)
-        logger.info(f"Converted ohlcv data to dataframe. Shape: {df.shape}")
+        logger.debug(f"Converted ohlcv data to dataframe. Shape: {df.shape}")
         return df
 
     def fetch_and_convert_ohlcv(self, symbol, timeframe, since=1262304000000):
