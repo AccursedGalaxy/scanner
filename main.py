@@ -4,6 +4,7 @@ import sys
 import logging
 import time
 import threading
+from datetime import datetime, timedelta
 
 # Add the 'src' directory to the sys.path list
 sys.path.append('./src')
@@ -37,9 +38,13 @@ def main():
         logger.error("Failed to initialize exchange.")
         return
 
-    # Fetch all available symbols from the exchange
-    symbols = list(ccxt_interface.exchange.markets.keys())
-    timeframe = '1h'  # Fetching 1-hour data to calculate both daily and hourly volumes
+    # Fetch all available symbols from the exchange and filter for "/USDT"
+    all_symbols = list(ccxt_interface.exchange.markets.keys())
+    symbols = [symbol for symbol in all_symbols if symbol.endswith('/USDT')]
+
+    # Calculate the timestamp for the last 30 days
+    since_time = datetime.utcnow() - timedelta(days=30)
+    since_timestamp = int(time.mktime(since_time.timetuple()) * 1000)
 
     ohlcv_dict = {}
 
@@ -47,7 +52,7 @@ def main():
         if ccxt_interface.check_symbol(symbol):
             try:
                 ohlcv_df = ccxt_interface.fetch_and_convert_ohlcv(
-                    symbol, timeframe)
+                    symbol, '1h', since=since_timestamp)
                 ohlcv_dict[symbol] = ohlcv_df
             except Exception as e:
                 logger.warning(f"Failed to fetch data for {symbol}: {e}")

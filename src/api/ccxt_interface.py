@@ -31,7 +31,7 @@ class CCXTInterface:
             return True
         return False
 
-    def fetch_ohlcv(self, symbol, timeframe, since=1262304000000):
+    def fetch_ohlcv(self, symbol, timeframe, since=None):
         ohlcv = []
         while True:
             try:
@@ -40,21 +40,24 @@ class CCXTInterface:
                     break
                 ohlcv += new_data
                 since = new_data[-1][0] + 1  # +1 to avoid duplicates
+                logger.info(
+                    f"Fetched {len(new_data)} for symbol: {symbol} total data points: {len(ohlcv)}")
             except Exception as e:
                 logger.error(f"Failed to fetch ohlcv: {e}")
                 break
         return ohlcv
-
-    def fetch_and_convert_ohlcv(self, symbol, timeframe, since=1262304000000):
-        ohlcv = self.fetch_ohlcv(symbol, timeframe, since)
-        df = self.convert_timestamp(ohlcv)
-        return df
 
     def convert_timestamp(self, ohlcv):
         df = pd.DataFrame(
             ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
         df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
         df.set_index('timestamp', inplace=True)
+        logger.info(f"Converted ohlcv data to dataframe. Shape: {df.shape}")
+        return df
+
+    def fetch_and_convert_ohlcv(self, symbol, timeframe, since=1262304000000):
+        ohlcv = self.fetch_ohlcv(symbol, timeframe, since)
+        df = self.convert_timestamp(ohlcv)
         return df
 
     def fetch_ticker(self, symbol):
