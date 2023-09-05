@@ -17,7 +17,8 @@ logger = logging.getLogger(__name__)
 
 
 class VolumeAnalysis:
-    def __init__(self):
+    def __init__(self, window):
+        self.window = window
         self.spikes_24h = []
         self.spikes_1h = []
 
@@ -46,7 +47,7 @@ class VolumeAnalysis:
     def check_volume_spike_24h(self, ohlcv_df):
         avg_daily_volume = self.average_volume_per_day(ohlcv_df)
         last_24h_volume = self.last_24_hours_volume(ohlcv_df)
-        if last_24h_volume > 1.5 * avg_daily_volume:
+        if last_24h_volume > 1.8 * avg_daily_volume:
             logger.info("Volume spike detected in the last 24 hours.")
             return True
         return False
@@ -54,7 +55,7 @@ class VolumeAnalysis:
     def check_volume_spike_1h(self, ohlcv_df):
         avg_hourly_volume = self.average_volume_per_hour(ohlcv_df)
         last_hour_volume = self.last_hour_volume(ohlcv_df)
-        if last_hour_volume > 2 * avg_hourly_volume:
+        if last_hour_volume > 1.5 * avg_hourly_volume:
             logger.info("Volume spike detected in the last hour.")
             return True
         return False
